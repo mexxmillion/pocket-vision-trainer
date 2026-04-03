@@ -1,0 +1,56 @@
+# PocketVision Fine-Tuning Config
+# Qwen3.5-2B LoRA for food/calorie estimation
+# Hardware: Threadripper + RTX 3090 (24GB VRAM)
+
+model:
+  name: "Qwen/Qwen3.5-2B"
+  torch_dtype: "bfloat16"
+
+lora:
+  r: 16
+  lora_alpha: 32
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  lora_dropout: 0.05
+  task_type: "CAUSAL_LM"
+
+training:
+  output_dir: "./adapters/run_01"
+  num_train_epochs: 2
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 4  # effective batch = 16
+  learning_rate: 2.0e-5
+  warmup_ratio: 0.03
+  lr_scheduler_type: "cosine"
+  bf16: true
+  gradient_checkpointing: true
+  logging_steps: 50
+  save_steps: 2000
+  eval_steps: 2000
+  save_total_limit: 3
+  dataloader_num_workers: 4
+  report_to: "wandb"
+  run_name: "pv-food-qwen35-2b-lora"
+
+dataset:
+  train_path: "./data/processed/train"
+  val_path: "./data/processed/val"
+  test_path: "./data/processed/test"
+  max_seq_length: 2048
+  image_max_size: 448
+
+prompt_variations:
+  - "Analyze this meal and estimate its nutritional content."
+  - "What food is in this image? Estimate the calories and macros."
+  - "I just ate this. How many calories?"
+  - "Break down the calories, protein, carbs, and fat in this food."
+  - "Estimate the nutritional value of this meal."
+  - "What are the macronutrients in this dish?"
+  - "Give me a calorie and macro breakdown for this food."
+  - "How many calories and grams of protein, carbs, and fat are in this?"

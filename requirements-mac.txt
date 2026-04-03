@@ -1,0 +1,4 @@
+# MLX conversion + validation (Mac only)
+mlx-lm>=0.30.7
+mlx-vlm>=0.3.12
+huggingface-hub>=1.5
